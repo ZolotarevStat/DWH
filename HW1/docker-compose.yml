@@ -1,0 +1,38 @@
+version: "3"
+services:
+  # Основная база данных PostgreSQL
+  primary-db:
+    image: postgres:14.5
+    container_name: primary-db
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data:/var/lib/postgresql/data
+      - ./data-slave:/var/lib/postgresql/data-slave
+      - ./init-script:/etc/postgresql/init-script
+      - ./init-script/config/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./init-script/config/postgres.conf:/etc/postgresql/postgresql.conf
+    environment:
+      - POSTGRES_USER=hw1_zol
+      - POSTGRES_PASSWORD=zol
+      - POSTGRES_DB=postgres
+
+
+
+  # Реплика PostgreSQL
+  replica-db:
+    image: postgres:14.5
+    container_name: replica-db
+    restart: always
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data-slave:/var/lib/postgresql/data
+      - ./init-script/config/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./init-script/config/postgres.conf:/etc/postgresql/postgresql.conf
+    environment:
+      - POSTGRES_USER=hw1_zol
+      - POSTGRES_PASSWORD=zol
+      - POSTGRES_DB=postgres
