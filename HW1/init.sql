@@ -63,8 +63,10 @@ CREATE TABLE public.price_change (
 );
 
 CREATE VIEW public.gmv_view AS
-SELECT p.store_id, pr.category_id, SUM(pur_it.product_price * pur_it.product_count) AS GMV
-FROM public.purchase_items pur_it
-INNER JOIN public.purchases p ON pur_it.purchase_id = p.purchase_id
-INNER JOIN public.products pr on pr.product_id = pur_it.product_id
-GROUP BY store_id, category_id;
+(
+    SELECT p.store_id, pr.category_id, SUM(pur_it.product_price * pur_it.product_count) AS GMV
+    FROM public.purchase_items pur_it
+    INNER JOIN public.purchases p ON pur_it.purchase_id = p.purchase_id
+    INNER JOIN public.products pr on pr.product_id = pur_it.product_id
+    GROUP BY store_id, category_id
+);
