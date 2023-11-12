@@ -14,12 +14,14 @@ CREATE TABLE public.categories (
 -- Creating products table
 CREATE TABLE public.products (
     product_id BIGINT  PRIMARY KEY,
+    category_id INTEGER,
+    manufacturer_id INTEGER,
     product_name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES public.categories(category_id),
-    FOREIGN KEY (manufacturer_id) REFERENCES public.manufacturers(manufacturer_id),
     product_picture_url VARCHAR(255) NOT NULL, --ссылка на изображение продукта
     product_description VARCHAR(255) NOT NULL, --описание продукта
-    product_age_restriction INTEGER NOT NULL --видимо, максимальный срок годности
+    product_age_restriction INTEGER NOT NULL ,--видимо, максимальный срок годности
+    FOREIGN KEY (category_id) REFERENCES public.categories(category_id),
+    FOREIGN KEY (manufacturer_id) REFERENCES public.manufacturers(manufacturer_id)
 );
 
 -- Creating stores table
@@ -33,11 +35,13 @@ CREATE TABLE public.stores (
 
 -- Creating deliveries table
 CREATE TABLE public.deliveries (
-    deliver_id BIGINT PRIMARY KEY,
-    FOREIGN KEY(store_id) REFERENCES public.stores(store_id),
-    FOREIGN KEY(product_id) REFERENCES public.products(product_id),
+    delivery_id BIGINT PRIMARY KEY, -- новая айдишка
+    store_id INTEGER,
+    product_id INTEGER,
     delivery_date DATE NOT NULL,
-    product_count INTEGER  NOT NULL
+    product_count INTEGER  NOT NULL,
+    FOREIGN KEY (store_id) REFERENCES public.stores(store_id),
+    FOREIGN KEY (product_id) REFERENCES public.products(product_id)
 );
 
 -- Creating customers table
@@ -52,25 +56,30 @@ CREATE TABLE public.customers (
 -- Creating purchases table
 CREATE TABLE public.purchases (
     purchase_id SERIAL PRIMARY KEY,
-    FOREIGN KEY(store_id) REFERENCES public.stores(store_id),
-    FOREIGN KEY(customer_id) REFERENCES public.customers(customer_id),
+    store_id INTEGER,
+    customer_id INTEGER,
     purchase_date TIMESTAMP NOT NULL ,
-    purchase_payment_type VARCHAR(100) NOT NULL --тип платежа
+    purchase_payment_type VARCHAR(100) NOT NULL, --тип платежа
+    FOREIGN KEY (store_id) REFERENCES public.stores(store_id),
+    FOREIGN KEY (customer_id) REFERENCES public.customers(customer_id)
 );
 
 -- Creating purchase_items table
 CREATE TABLE public.purchase_items (
-    FOREIGN KEY (product_id) REFERENCES public.products(product_id),
-    FOREIGN KEY (purchase_id) REFERENCES public.purchases(purchase_id),
+    product_id INTEGER,
+    purchase_id INTEGER,
     product_count BIGINT  NOT NULL,
-    product_price NUMERIC(9,2) NOT NULL
+    product_price NUMERIC(9,2) NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES public.products(product_id),
+    FOREIGN KEY (purchase_id) REFERENCES public.purchases(purchase_id)
 );
 
 -- Creating price_change table
 CREATE TABLE public.price_change (
-    FOREIGN KEY (product_id) REFERENCES public.products(product_id),
+    product_id INTEGER,
     price_change_ts TIMESTAMP NOT NULL,
-    new_price NUMERIC(9,2) NOT NULL
+    new_price NUMERIC(9,2) NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES public.products(product_id)
 );
 
 CREATE VIEW public.gmv_view AS
